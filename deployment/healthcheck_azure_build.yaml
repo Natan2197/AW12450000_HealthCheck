@@ -13,8 +13,6 @@ resources:
 trigger:
   branches:
     include:
-      - master
-      - trunk
       - main
       - feature/*
 

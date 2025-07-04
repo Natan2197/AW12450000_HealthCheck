@@ -1,47 +1,133 @@
-# Proyecto Base Implementando Clean Architecture
+# Python Microservice
 
-## Antes de Iniciar
+Microservicio de Java que implementa un punto de acceso para validar su estado siguiendo principios de arquitectura limpia.
 
-Empezaremos por explicar los diferentes componentes del proyectos y partiremos de los componentes externos, continuando con los componentes core de negocio (dominio) y por último el inicio y configuración de la aplicación.
+## Estructura del proyecto
 
-Lee el artículo [Clean Architecture — Aislando los detalles](https://medium.com/bancolombia-tech/clean-architecture-aislando-los-detalles-4f9530f35d7a)
+```
+AW12450000_HealthCheck/
+├── applications/
+│   └── app-service/                  # Capa de aplicación: clase Main, configuración principal del microservicio
+│
+├── domain/
+│   ├── model/                        # Modelos del dominio (entidades, value objects, etc.)
+│   └── usecase/                      # Casos de uso (lógica de negocio y orquestación)
+│
+├── infrastructure/
+│   └── entry-points/
+│       └── api-rest/                # Adaptador de entrada: controladores REST (exposición de endpoints HTTP)
+│
+├── deployment/
+│   ├── acceptanceTest/              # Pruebas de aceptación
+│   ├── performanceTest/             # Pruebas de performance o carga
+│   ├── azure-pipeline.yaml          # YAML del pipeline CI (build, test, calidad, publicación de artefactos)
+│   └── Dockerfile                   # Dockerfile para el empaquetado y despliegue del microservicio
 
-# Arquitectura
+```
 
-![Clean Architecture](https://miro.medium.com/max/1400/1*ZdlHz8B0-qu9Y-QO3AXR_w.png)
+## Uso
 
-## Domain
+Para levantar el microservicio usando IntelliJ Idea, hacerlo ejecutando el siguiente comando:
+```
+gradle bootRun
+```
 
-Es el módulo más interno de la arquitectura, pertenece a la capa del dominio y encapsula la lógica y reglas del negocio mediante modelos y entidades del dominio.
+El llamado a realizar sera una peticion GET a `http://localhost:8080/api/usecase/life-status`.
 
-## Usecases
+## Calidad y pruebas
 
-Este módulo gradle perteneciente a la capa del dominio, implementa los casos de uso del sistema, define lógica de aplicación y reacciona a las invocaciones desde el módulo de entry points, orquestando los flujos hacia el módulo de entities.
+Este proyecto incluye diferentes tipos de pruebas para asegurar la calidad y el correcto funcionamiento del microservicio:
 
-## Infrastructure
+- **Pruebas unitarias:** Validan el comportamiento de funciones o componentes individuales de forma aislada.
+      ```
+- **Pruebas de aceptación:** Verifican que el sistema cumple los requisitos funcionales desde el punto de vista del usuario.
+      ```
+- **Pruebas de performance:** Evalúan el rendimiento del endpoint `/api/usecase/life-status`.
+      ```
+- **Pruebas de smoke:** Incluidas en las pruebas de aceptación y E2E, validan que el servicio responde correctamente.
 
-### Helpers
+## Arquitectura (Diagrama)
 
-En el apartado de helpers tendremos utilidades generales para los Driven Adapters y Entry Points.
+```
++-------------------+         HTTP GET /api/usecase/life-status         +-----------------------------+
+|                   |  ----------------------------->  |                                              |
+|  Cliente/Monitor  |                                  |  Java Microservicio                          |
+|  (Orquestador,    |  <-----------------------------  |  ( Arquitectura Limpia Scaffold )            |
+|   Balanceador,    |         JSON: {"status": ...}    |                                              |
+|   etc.)           |                                  |                                              |
+|                   |                                  |  applications/app-service                    |
+|                   |                                  |    → Main & configuración                    |
+|                   |                                  |                                              |
+|                   |                                  |  domain/                                     |
+|                   |                                  |    ├── model                                 |
+|                   |                                  |    └── usecase                               |
+|                   |                                  |                                              |
+|                   |                                  |  infrastructure/entry-points                 |
+|                   |                                  |    └── api-rest                              |
+|                   |                                  |                                              |
+|                   |                                  |  deployment/                                 |
+|                   |                                  |    ├── acceptanceTest                        |
+|                   |                                  |    └── performanceTest                       |
+|                   |                                  |                                              |
+|                   |                                  |  Swagger: /swagger.yaml                      |
++-------------------+                                                   +-----------------------------+
 
-Estas utilidades no están arraigadas a objetos concretos, se realiza el uso de generics para modelar comportamientos
-genéricos de los diferentes objetos de persistencia que puedan existir, este tipo de implementaciones se realizan
-basadas en el patrón de diseño [Unit of Work y Repository](https://medium.com/@krzychukosobudzki/repository-design-pattern-bc490b256006)
+```
 
-Estas clases no puede existir solas y debe heredarse su compartimiento en los **Driven Adapters**
+La arquitectura del proyecto sigue el patrón de **arquitectura limpia (Clean Architecture)**, promoviendo la separación de responsabilidades y facilitando la mantenibilidad, escalabilidad y testabilidad del sistema.
 
-### Driven Adapters
+**Componentes principales:**
 
-Los driven adapter representan implementaciones externas a nuestro sistema, como lo son conexiones a servicios rest,
-soap, bases de datos, lectura de archivos planos, y en concreto cualquier origen y fuente de datos con la que debamos
-interactuar.
+- **API Layer (`api/`)**: Expone los endpoints HTTP (por ejemplo, `/api/usecase/life-status`). Aquí se definen los controladores que reciben las solicitudes y devuelven las respuestas.
+- **Domain Layer (`domain/`)**: Contiene la lógica de negocio central. En este caso, la lógica es simple, pero este módulo permite crecer el sistema sin acoplarlo a frameworks.
+- **Services Layer (`services/`)**: Implementa la lógica de aplicación, orquestando la interacción entre el dominio y la infraestructura.
+- **Infrastructure Layer (`infrastructure/`)**: Gestiona la interacción con recursos externos (bases de datos, servicios externos, etc.). En este microservicio, puede estar vacío o preparado para futuras integraciones.
+- **Tests (`tests/`)**: Incluye pruebas unitarias y de aceptación para asegurar la calidad y el correcto funcionamiento del microservicio.
 
-### Entry Points
+**Flujo de la solicitud:**
 
-Los entry points representan los puntos de entrada de la aplicación o el inicio de los flujos de negocio.
+1. El cliente o sistema de monitoreo realiza una petición HTTP GET al endpoint `/api/usecase/life-status`.
+2. El controlador en la capa API recibe la solicitud y delega la lógica a la función correspondiente.
+3. La función retorna el estado de salud del sistema en formato JSON.
+4. El controlador responde al cliente con el estado y el código HTTP adecuado.
 
-## Application
+**Ventajas de esta arquitectura:**
 
-Este módulo es el más externo de la arquitectura, es el encargado de ensamblar los distintos módulos, resolver las dependencias y crear los beans de los casos de use (UseCases) de forma automática, inyectando en éstos instancias concretas de las dependencias declaradas. Además inicia la aplicación (es el único módulo del proyecto donde encontraremos la función “public static void main(String[] args)”.
+- Permite escalar y modificar el microservicio fácilmente.
+- Facilita la realización de pruebas unitarias y de integración.
+- Separa la lógica de negocio de los detalles de infraestructura
 
-**Los beans de los casos de uso se disponibilizan automaticamente gracias a un '@ComponentScan' ubicado en esta capa.**
+## License
+
+This project is licensed under the MIT License.
+
+## Despliegue con Docker/Podman/WSL
+
+Puedes ejecutar el microservicio en un contenedor usando Docker o Podman:
+
+1. **Construir la imagen usando Docker o Podman:**
+   ```sh
+   docker build -t HealthCheck .
+   ```
+
+2. **Ejecuta el contenedor:**
+   ```sh
+   docker run -d -p 8080:8080 HealthCheck
+   ```
+
+3. **Verifica el endpoint:**
+   Acceder a los endpoints:
+   ```
+   http://localhost:8080/api/usecase/life-status
+   ```
+---
+
+### Ejemplo de nombre de rama y repositorio
+
+````markdown
+## Estandar de ramas y repositorio
+
+- **Repositorio:** `AW12450000_HealthCheck`
+- **Rama de feature:** `feature/microservice-operation`
+- **Rama de release:** `trunk`
+`````

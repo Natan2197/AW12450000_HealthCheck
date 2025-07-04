@@ -5,7 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import co.com.bancolombia.usecase.checkstatus.CheckStatusUseCase;
 import org.springframework.test.web.servlet.MockMvc;
-import co.com.bancolombia.model.status.StatusMicro;
+import co.com.bancolombia.model.checkstatus.CheckStatus;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
@@ -34,7 +34,7 @@ class ApiRestTest {
     @Test
     void apiRestTest() throws Exception {
         // Arrange
-        StatusMicro mockResponse = StatusMicro.builder()
+        CheckStatus mockResponse = CheckStatus.builder()
                 .statusCode(200)
                 .messageStatus("Servicio ok")
                 .build();

@@ -1,4 +1,4 @@
-# Python Microservice
+# Java Microservice
 
 Microservicio de Java que implementa un punto de acceso para validar su estado siguiendo principios de arquitectura limpia.
 
@@ -21,6 +21,7 @@ AW12450000_HealthCheck/
 │   ├── acceptanceTest/              # Pruebas de aceptación
 │   ├── performanceTest/             # Pruebas de performance o carga
 │   ├── azure-pipeline.yaml          # YAML del pipeline CI (build, test, calidad, publicación de artefactos)
+│   ├── swagger.yaml                 # YAML con las operaciones disponibles en el microservicio
 │   └── Dockerfile                   # Dockerfile para el empaquetado y despliegue del microservicio
 
 ```
@@ -128,6 +129,7 @@ Puedes ejecutar el microservicio en un contenedor usando Docker o Podman:
 ## Estandar de ramas y repositorio
 
 - **Repositorio:** `AW12450000_HealthCheck`
-- **Rama de feature:** `feature/microservice-operation`
-- **Rama de release:** `trunk`
+- **Rama de feature:** `feature/create-operation`
+- **Rama de feature:** `feature/generate-all-test`
+- **Rama de release:** `main`
 `````

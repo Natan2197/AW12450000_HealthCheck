@@ -5,6 +5,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import co.com.bancolombia.model.checkstatus.CheckStatus;
+import co.com.bancolombia.usecase.checkstatus.CheckStatusUseCase;
+
 /**
  * API Rest controller.
  * 
@@ -22,9 +25,10 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class ApiRest {
 
+    private final CheckStatusUseCase checkStatusUseCase;
 
-    @GetMapping(path = "/usecase/path")
-    public String commandName() {
-        return "";
+    @GetMapping(path = "/usecase/life-status")
+    public CheckStatus getStatusMicro() {
+        return checkStatusUseCase.getStatus();
     }
 }

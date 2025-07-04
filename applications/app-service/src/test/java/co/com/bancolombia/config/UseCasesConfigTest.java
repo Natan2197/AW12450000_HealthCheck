@@ -1,11 +1,13 @@
 package co.com.bancolombia.config;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
+import co.com.bancolombia.model.checkstatus.gateways.CheckStatusRepository;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import co.com.bancolombia.model.checkstatus.CheckStatus;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Bean;
+import org.junit.jupiter.api.Test;
 
 public class UseCasesConfigTest {
 
@@ -31,14 +33,11 @@ public class UseCasesConfigTest {
     static class TestConfig {
 
         @Bean
-        public MyUseCase myUseCase() {
-            return new MyUseCase();
-        }
-    }
-
-    static class MyUseCase {
-        public String execute() {
-            return "MyUseCase Test";
+        public CheckStatusRepository checkStatusRepository() {
+            return () -> CheckStatus.builder()
+                    .statusCode(200)
+                    .messageStatus("mocked")
+                    .build();
         }
     }
 }
